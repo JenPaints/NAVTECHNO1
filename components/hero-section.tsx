@@ -44,12 +44,55 @@ const optimizeScene = (scene: THREE.Scene) => {
 const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: number, showIntro: boolean }) => {
   const modelContainerRef = useRef<THREE.Group>(null);
   const modelRefs = useRef<THREE.Object3D[]>([]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
   
   // Preload models for better performance
   useEffect(() => {
     useGLTF.preload(MODEL_PATHS.light);
     useGLTF.preload(MODEL_PATHS.dongle);
     useGLTF.preload(MODEL_PATHS.fso);
+
+    // GSAP Animations
+    gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
+
+    if (sectionRef.current && titleRef.current && descriptionRef.current && ctaRef.current) {
+      gsap.fromTo(titleRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1, ease: "power3.out" });
+      gsap.fromTo(descriptionRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1, delay: 0.2, ease: "power3.out" });
+      gsap.fromTo(ctaRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1, delay: 0.4, ease: "power3.out" });
+
+      // Example ScrollTrigger animation for the section
+      gsap.fromTo(sectionRef.current, 
+        { opacity: 0 }, 
+        { 
+          opacity: 1, 
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top center",
+            end: "bottom center",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    }
+
+    // WebGL Context Lost/Restored handling
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      canvas.addEventListener('webglcontextlost', (event) => {
+        event.preventDefault();
+        console.warn('WebGL Context Lost. Attempting to restore...');
+        // Optionally display a message to the user
+      }, false);
+
+      canvas.addEventListener('webglcontextrestored', () => {
+        console.log('WebGL Context Restored.');
+        // Re-render or re-initialize Three.js components if necessary
+      }, false);
+    }
+
   }, []);
   
   // Load the 3D models
@@ -107,7 +150,7 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
   }), [])
 
   return (
-    <div className="relative w-full h-full">
+    <div ref={sectionRef} className="relative w-full h-full">
       <Canvas
         camera={cameraSettings}
         style={{ width: "100%", height: "100%" }}
@@ -140,6 +183,8 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
             rotation={[0, 0, 0]}
             polar={[-Math.PI / 4, Math.PI / 4]}
             azimuth={[-Math.PI / 4, Math.PI / 4]}
+            snap
+            config={{ mass: 2, tension: 500, friction: 50 }}
           >
             <Float
               speed={2}
@@ -148,6 +193,8 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
               floatingRange={[0, 0.5]}
             >
               <group ref={modelContainerRef} position={[0, 0, 0]} userData={{ id: "model-container" }}>
+                {/* Add a light source within the group if needed for specific model lighting */}
+                <directionalLight position={[1, 1, 1]} intensity={0.5} />
                 {optimizedScenes.map((scene, index) => {
                   // Only show the active model during normal operation, or all models during intro
                   const isVisible = showIntro || index === activeModel;
@@ -198,6 +245,18 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
           />
         </svg>
         <span>Interactive 3D</span>
+      </div>
+
+      {/* Hero Section Content - Ensure these elements exist for GSAP to target */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+        <h1 ref={titleRef} className="text-5xl md:text-7xl font-bold text-white mb-4 opacity-0">Navtech Solutions</h1>
+        <p ref={descriptionRef} className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl opacity-0">Innovating the future with advanced LiFi and FSO technologies.</p>
+        <div ref={ctaRef} className="opacity-0">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out">
+            Learn More
+          </button>
+        </div>
+      </div>
       </div>
     </div>
   )
