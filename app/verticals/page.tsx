@@ -1,0 +1,1 @@
+// This file is intentionally left empty to resolve 404 errors for the /verticals route.
