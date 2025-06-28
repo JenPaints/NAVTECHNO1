@@ -42,6 +42,8 @@ const optimizeScene = (scene: THREE.Scene) => {
 
 // Animated 3D Scene Component
 const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: number, showIntro: boolean }) => {
+  // Use a key to force re-mount when showIntro changes, if necessary
+  const sceneKey = showIntro ? 'intro-scene' : 'main-scene';
   const modelContainerRef = useRef<THREE.Group>(null);
   const modelRefs = useRef<THREE.Object3D[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -151,6 +153,7 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
 
   return (
     <div ref={sectionRef} className="relative w-full h-full">
+      <div key={sceneKey} className="absolute inset-0">
       <Canvas
         camera={cameraSettings}
         style={{ width: "100%", height: "100%" }}
@@ -258,7 +261,8 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
         </div>
      </div>
     </div>
-  )
+    </div>
+    )
 })
 
 Scene3D.displayName = "Scene3D"
