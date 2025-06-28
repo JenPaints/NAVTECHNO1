@@ -41,15 +41,18 @@ const optimizeScene = (scene: THREE.Scene) => {
 }
 
 // Animated 3D Scene Component
-const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: number, showIntro: boolean }) => {
+const Scene3D = memo(({ activeModel, showIntro, titleRef, descriptionRef, ctaRef, ...props }: {
+  activeModel: number,
+  showIntro: boolean,
+  titleRef: React.RefObject<HTMLHeadingElement>,
+  descriptionRef: React.RefObject<HTMLParagraphElement>,
+  ctaRef: React.RefObject<HTMLDivElement>
+}) => {
   // Use a key to force re-mount when showIntro changes, if necessary
   const sceneKey = showIntro ? 'intro-scene' : 'main-scene';
   const modelContainerRef = useRef<THREE.Group>(null);
   const modelRefs = useRef<THREE.Object3D[]>([]);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const descriptionRef = useRef<HTMLParagraphElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
   
   // Preload models for better performance
   useEffect(() => {
@@ -250,16 +253,7 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
         <span>Interactive 3D</span>
       </div>
 
-      {/* Hero Section Content - Ensure these elements exist for GSAP to target */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-        <h1 ref={titleRef} className="text-5xl md:text-7xl font-bold text-white mb-4 opacity-0">Navtech Solutions</h1>
-        <p ref={descriptionRef} className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl opacity-0">Innovating the future with advanced LiFi and FSO technologies.</p>
-        <div ref={ctaRef} className="opacity-0">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out">
-            Learn More
-          </button>
-        </div>
-     </div>
+
     </div>
     </div>
     )
@@ -540,11 +534,17 @@ export default function HeroSection() {
         
         {/* 3D Model container */}
         <div 
-          ref={modelContainerRef} 
-          className="w-full lg:w-1/2 h-[400px] md:h-[500px] lg:h-[600px]"
-        >
-          <Scene3D activeModel={activeModel} showIntro={showIntro} />
-        </div>
+            ref={modelContainerRef} 
+            className="w-full lg:w-1/2 h-[400px] md:h-[500px] lg:h-[600px]"
+          >
+            <Scene3D 
+              activeModel={activeModel} 
+              showIntro={showIntro}
+              titleRef={titleRef}
+              descriptionRef={subtitleRef}
+              ctaRef={ctaRef}
+            />
+          </div>
       </div>
     </section>
   )
