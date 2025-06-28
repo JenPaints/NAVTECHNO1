@@ -256,8 +256,7 @@ const Scene3D = memo(({ activeModel, showIntro, ...props }: { activeModel: numbe
             Learn More
           </button>
         </div>
-      </div>
-      </div>
+     </div>
     </div>
   )
 })
