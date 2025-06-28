@@ -4,9 +4,11 @@ import { useEffect, useRef } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import Navbar from "@/components/navbar"
-import HeroSection from "@/components/hero-section"
+import dynamic from "next/dynamic"
 import TextSection from "@/components/text-section"
-import HorizontalSection from "@/components/horizontal-section"
+
+const HeroSection = dynamic(() => import("@/components/hero-section"), { ssr: false })
+const HorizontalSection = dynamic(() => import("@/components/horizontal-section"), { ssr: false })
 import AboutSection from "@/components/about-section"
 import PartnershipsSection from "@/components/partnerships-section"
 import VerticalsSection from "@/components/verticals-section"
